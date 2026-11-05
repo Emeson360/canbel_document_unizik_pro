@@ -1,0 +1,8 @@
+/* Import Chakra UI theme */
+/* @import '~@chakra-ui/theme'; */
+
+.activeSideLink .sideLink {
+    color: #ce0100;
+    border-right: 3px solid #fff;
+    border-color: #ce0100;
+}

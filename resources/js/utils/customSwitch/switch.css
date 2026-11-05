@@ -1,0 +1,84 @@
+.container {
+  /* text-align: center; */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.label-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+.toggle-switch {
+  position: relative;
+  width: 40px;
+  display: inline-block;
+  text-align: left;
+  top: 0;
+}
+.checkbox {
+  display: none;
+}
+.label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  border: 0 solid #bbb;
+  border-radius: 20px;
+}
+.inner {
+  display: block;
+  width: 200%;
+  margin-left: 0;
+  transition: margin 0.3s ease-in 0s;
+}
+.inner:before,
+.inner:after {
+  float: left;
+  width: 50%;
+  height: 20px;
+  padding: 0;
+  line-height: 36px;
+  color: var(--chakra-colors-root-primary);
+  font-weight: bold;
+  box-sizing: border-box;
+}
+.inner:before {
+  content: "";
+  padding-left: 10px;
+  background-color: #f4f4f4;
+  transition: 0.3s ease-in 0s;
+  color: var(--chakra-colors-root-primary);
+}
+.inner:after {
+  content: "";
+  padding-right: 10px;
+  background-color: var(--chakra-colors-root-primary);
+  color: #f7f7f8;
+  text-align: right;
+}
+.switch {
+  display: block;
+  width: 15px;
+  margin: 2px;
+  background: var(--chakra-colors-root-primary);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 20px;
+  border: 0px solid #d3d4da;
+  border-radius: 20px;
+  transition: all 0.3s ease-in 0s;
+}
+.checkbox:checked + .label .inner {
+  margin-left: 0;
+}
+.checkbox:checked + .label .inner::before {
+  background-color: var(--chakra-colors-root-primary);
+}
+.checkbox:checked + .label .switch {
+  right: 0px;
+  background: #f7f7f8;
+}
+.checkbox:disabled + .label .inner::before {
+  opacity: 0.5;
+}

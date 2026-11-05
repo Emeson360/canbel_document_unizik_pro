@@ -1,0 +1,56 @@
+{
+  "node_modules/@fontsource-variable/red-hat-text/files/red-hat-text-latin-ext-wght-normal.woff2": {
+    "file": "assets/red-hat-text-latin-ext-wght-normal-61aba01c.woff2",
+    "src": "node_modules/@fontsource-variable/red-hat-text/files/red-hat-text-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/red-hat-text/files/red-hat-text-latin-wght-normal.woff2": {
+    "file": "assets/red-hat-text-latin-wght-normal-9f1db13b.woff2",
+    "src": "node_modules/@fontsource-variable/red-hat-text/files/red-hat-text-latin-wght-normal.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-4ed993c7.js",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/js/app.css": {
+    "file": "assets/app-8e2e2336.css",
+    "src": "resources/js/app.css"
+  },
+  "resources/js/app.tsx": {
+    "assets": [
+      "assets/logo-a7c3f1b5.png",
+      "assets/LobsterTwo-Bold-ac60131b.ttf",
+      "assets/undergrad-template-fbc47b2f.jpg",
+      "assets/postgrad-template-9b89dd34.jpg",
+      "assets/ep_success-filled-38adde8a.svg",
+      "assets/red-hat-text-latin-ext-wght-normal-61aba01c.woff2",
+      "assets/red-hat-text-latin-wght-normal-9f1db13b.woff2"
+    ],
+    "css": [
+      "assets/app-8e2e2336.css"
+    ],
+    "file": "assets/app-531dfb72.js",
+    "isEntry": true,
+    "src": "resources/js/app.tsx"
+  },
+  "resources/js/assets/fonts/Lobster_Two/LobsterTwo-Bold.ttf": {
+    "file": "assets/LobsterTwo-Bold-ac60131b.ttf",
+    "src": "resources/js/assets/fonts/Lobster_Two/LobsterTwo-Bold.ttf"
+  },
+  "resources/js/assets/images/ep_success-filled.svg": {
+    "file": "assets/ep_success-filled-38adde8a.svg",
+    "src": "resources/js/assets/images/ep_success-filled.svg"
+  },
+  "resources/js/assets/images/logo.png": {
+    "file": "assets/logo-a7c3f1b5.png",
+    "src": "resources/js/assets/images/logo.png"
+  },
+  "resources/js/assets/images/postgrad-template.jpg": {
+    "file": "assets/postgrad-template-9b89dd34.jpg",
+    "src": "resources/js/assets/images/postgrad-template.jpg"
+  },
+  "resources/js/assets/images/undergrad-template.jpg": {
+    "file": "assets/undergrad-template-fbc47b2f.jpg",
+    "src": "resources/js/assets/images/undergrad-template.jpg"
+  }
+}

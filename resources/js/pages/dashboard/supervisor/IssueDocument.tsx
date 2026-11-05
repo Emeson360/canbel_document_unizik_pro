@@ -1,0 +1,394 @@
+import { ChangeEvent, useState } from "react";
+import { Heading, Box, Flex, Button, Image, Text } from "@chakra-ui/react";
+import CustomInput from "../../../utils/CustomInput";
+import {
+    checkEmptyFields,
+    classifyCgpa,
+    formatDateForMySQL,
+    isCgpaValid,
+    replaceUnderscoreWithSpace,
+} from "../../../utils/helpers";
+import { useColorModeValue } from "@chakra-ui/react";
+import CustomMenu from "@/utils/CustomMenu";
+import {
+    DepartmentInterface,
+    FacultyInterface,
+    StudentSubmissionInterface,
+} from "@/utils/types";
+import { DocumentMenu } from "@/utils/DocumentMenu";
+import FormSideEffects from "@/utils/FormSideEffects";
+import { router } from "@inertiajs/react";
+import { showError } from "@/utils/Alert";
+import { InvalidDoc } from "../admin/PreviewDocument";
+
+interface PageProps {
+    departments: DepartmentInterface[];
+    faculties: FacultyInterface[];
+    disciplines: string[];
+    submission: StudentSubmissionInterface | null;
+    errors: any;
+}
+
+const IssueDocument = ({
+    departments,
+    faculties,
+    disciplines,
+    submission,
+    errors,
+}: PageProps) => {
+    const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+    const departmentsItemsArr = departments.map((val) => ({
+        label: val.name,
+        value: val.id.toString(),
+    }));
+    const facultyItemsArr = faculties.map((val) => ({
+        label: val.name,
+        value: val.id.toString(),
+    }));
+    const disciplinesItemsArr = disciplines.map((val) => ({
+        label: val.toUpperCase(),
+        value: val,
+    }));
+    const [formState, setFormState] = useState({
+        type: submission?.document_type || "",
+        effective_date: "",
+        holders_name: submission?.full_name || "",
+        registration_number: submission?.registration_number || "",
+        nin: submission?.nin || "",
+        dob: submission?.dob ? submission.dob.slice(0, 10) : "",
+        faculty_id: submission?.faculty_id?.toString() || "",
+        department_id: submission?.department_id?.toString() || "",
+        discipline: "",
+        cgpa: "",
+        cgpa_class: "",
+    });
+
+    const isPostgraduate = formState.type === "postgraduate";
+
+    const handleInputs = (
+        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    ) => {
+        const { name, value } = e.target;
+
+        if (name === "cgpa") {
+            setFormState({
+                ...formState,
+                cgpa: value,
+                cgpa_class: isCgpaValid(value) ? classifyCgpa(value) : "",
+            });
+            return;
+        }
+
+        setFormState({ ...formState, [name]: value });
+    };
+
+    const handleSubmit = () => {
+        const {
+            holders_name,
+            department_id,
+            discipline,
+            effective_date,
+            cgpa,
+            faculty_id,
+            type,
+            cgpa_class,
+        } = formState;
+
+        if (!isPostgraduate && cgpa && !isCgpaValid(cgpa)) {
+            showError("CGPA must be a number between 1.0 and 4.0");
+            return;
+        }
+
+        const isFieldsEmpty = checkEmptyFields({
+            holders_name,
+            department: department_id,
+            given_date: effective_date,
+            faculty: faculty_id,
+            type,
+            ...(isPostgraduate ? {} : { discipline, cgpa_class, cgpa }),
+        });
+
+        if (isFieldsEmpty) return;
+
+        // TODO: format effective_date before submission
+        setIsFormSubmitting(true);
+        router.post("/supervisor/documents/issue-document", {
+            ...formState,
+            effective_date: formatDateForMySQL(effective_date),
+            student_submission_id: submission?.id,
+        });
+    };
+
+    const Bg = useColorModeValue("#fff", "gray.800");
+
+    const borderColor = useColorModeValue("#111111", "#ffffff"); // Dark for light mode, light for dark mode
+    const border = `1px solid ${borderColor}`;
+
+    return (
+        <>
+            <FormSideEffects
+                errors={errors}
+                onError={() => {
+                    setIsFormSubmitting(false);
+                }}
+                onSuccess={() => setIsFormSubmitting(false)}
+            />
+            <Box
+                mt={[3, 0]}
+                rounded={"12px"}
+                minH={"300px"}
+                bg={Bg}
+                px={"40px"}
+                py={"40px"}
+            >
+                <Heading
+                    as={"h3"}
+                    fontSize={"24px"}
+                    fontWeight={700}
+                    mb={"32px"}
+                >
+                    Issue Document
+                </Heading>
+                {!submission ? (
+                    <InvalidDoc />
+                ) : (
+                    <Box>
+                        <Box
+                            border={border}
+                            shadow={
+                                "14px 27px 45px 4px #B0B5B90D, -14px -25px 45px 4px #B0B5B90D"
+                            }
+                            padding={"22px 20px"}
+                            rounded={"12px"}
+                            mb={"32px"}
+                        >
+                            <Heading
+                                as={"h4"}
+                                fontSize={"20px"}
+                                fontWeight={700}
+                                mb={"24px"}
+                            >
+                                Document Info
+                            </Heading>
+
+                            <Box mb={"22px"}>
+                                <CustomInput
+                                    label="Document Type"
+                                    value={replaceUnderscoreWithSpace(
+                                        submission.document_type?.toUpperCase() ||
+                                            "",
+                                    )}
+                                    readOnly
+                                    greyInput={true}
+                                />
+                            </Box>
+
+                            <Box>
+                                <CustomInput
+                                    label="Given date"
+                                    type="date"
+                                    value={formState.effective_date}
+                                    name="effective_date"
+                                    onChange={handleInputs}
+                                    greyInput={true}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box
+                            border={border}
+                            shadow={
+                                "14px 27px 45px 4px #B0B5B90D, -14px -25px 45px 4px #B0B5B90D"
+                            }
+                            padding={"22px 20px"}
+                            rounded={"12px"}
+                            mb={"32px"}
+                        >
+                            <Heading
+                                as={"h4"}
+                                fontSize={"20px"}
+                                fontWeight={700}
+                                mb={"24px"}
+                            >
+                                Student Record
+                            </Heading>
+
+                            <Box mb={"22px"}>
+                                <Text fontWeight={500} color={"#48494D"} mb={2}>
+                                    Passport Photograph
+                                </Text>
+                                <Flex
+                                    align={"center"}
+                                    gap={4}
+                                    p={3}
+                                    rounded={"8px"}
+                                    border={"1px dashed"}
+                                    borderColor={"#D3D4DA"}
+                                    bg={"#F7F7F8"}
+                                    cursor={"not-allowed"}
+                                >
+                                    <Box
+                                        boxSize={"70px"}
+                                        rounded={"8px"}
+                                        overflow={"hidden"}
+                                        border={"1px solid"}
+                                        borderColor={"#D3D4DA"}
+                                        bg={"white"}
+                                        flexShrink={0}
+                                    >
+                                        {submission.passport_photo_url ? (
+                                            <Image
+                                                src={
+                                                    submission.passport_photo_url
+                                                }
+                                                alt="passport preview"
+                                                boxSize={"70px"}
+                                                objectFit={"cover"}
+                                            />
+                                        ) : null}
+                                    </Box>
+                                    <Text fontSize={"sm"} color={"#48494D"}>
+                                        Photo on file from student portal —
+                                        locked
+                                    </Text>
+                                </Flex>
+                            </Box>
+                            <Box mb={"22px"}>
+                                <CustomInput
+                                    label="Holder's name"
+                                    value={formState.holders_name}
+                                    name="holders_name"
+                                    onChange={handleInputs}
+                                    greyInput={true}
+                                />
+                            </Box>
+                            <Box mb={"22px"}>
+                                <CustomInput
+                                    label="Registration number"
+                                    value={formState.registration_number}
+                                    name="registration_number"
+                                    readOnly
+                                    greyInput={true}
+                                />
+                            </Box>
+                            <Flex
+                                gap={"10px"}
+                                direction={["column", "row"]}
+                                mb={"22px"}
+                            >
+                                <Box width={["full", "50%"]}>
+                                    <CustomInput
+                                        label="NIN"
+                                        value={formState.nin}
+                                        name="nin"
+                                        readOnly
+                                        greyInput={true}
+                                    />
+                                </Box>
+                                <Box width={["full", "50%"]}>
+                                    <CustomInput
+                                        label="Date of birth"
+                                        type="date"
+                                        value={formState.dob}
+                                        name="dob"
+                                        readOnly
+                                        greyInput={true}
+                                    />
+                                </Box>
+                            </Flex>
+                            <Box mb={"22px"}>
+                                <DocumentMenu
+                                    label={"Faculty"}
+                                    value={formState.faculty_id}
+                                    items={facultyItemsArr}
+                                    onChange={(val) =>
+                                        setFormState({ ...formState, faculty_id: val })
+                                    }
+                                />
+                            </Box>
+                            <Flex
+                                gap={"10px"}
+                                direction={["column", "row"]}
+                                mb={"22px"}
+                            >
+                                {isPostgraduate ? (
+                                    ""
+                                ) : (
+                                    <Box width={["full", "50%"]}>
+                                        <CustomMenu
+                                            label={"Discipline"}
+                                            value={formState.discipline}
+                                            items={disciplinesItemsArr}
+                                            setValue={(val) =>
+                                                setFormState({
+                                                    ...formState,
+                                                    discipline: val,
+                                                })
+                                            }
+                                        />
+                                    </Box>
+                                )}
+                                <Box
+                                    width={[
+                                        "full",
+                                        isPostgraduate ? "full" : "50%",
+                                    ]}
+                                >
+                                    <DocumentMenu
+                                        label={"Department"}
+                                        value={formState.department_id}
+                                        items={departmentsItemsArr}
+                                        onChange={(value) =>
+                                            setFormState({
+                                                ...formState,
+                                                department_id: value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                            </Flex>
+                            {isPostgraduate ? (
+                                ""
+                            ) : (
+                                <Flex gap={"10px"} direction={["column", "row"]}>
+                                    <Box width={["full", "50%"]}>
+                                        <CustomInput
+                                            label="CGPA"
+                                            type="number"
+                                            value={formState.cgpa}
+                                            name="cgpa"
+                                            onChange={handleInputs}
+                                            greyInput={true}
+                                        />
+                                    </Box>
+                                    <Box width={["full", "50%"]}>
+                                        <CustomInput
+                                            label="Classified as"
+                                            value={formState.cgpa_class}
+                                            name="cgpa_class"
+                                            readOnly
+                                            greyInput={true}
+                                        />
+                                    </Box>
+                                </Flex>
+                            )}
+                        </Box>
+
+                        <Flex mt={10} gap={5} align={"center"}>
+                            <Button
+                                width={"full"}
+                                variant={"primary"}
+                                isLoading={isFormSubmitting}
+                                onClick={handleSubmit}
+                            >
+                                Submit
+                            </Button>
+                        </Flex>
+                    </Box>
+                )}
+            </Box>
+        </>
+    );
+};
+
+export default IssueDocument;
